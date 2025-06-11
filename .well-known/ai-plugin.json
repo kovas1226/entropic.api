@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Quantum Entropic API",
+  "name_for_model": "quantum_entropic_api",
+  "description_for_human": "Symbolic engine for quantum matrix predictions and intention collapse.",
+  "description_for_model": "Run symbolic calculations using endpoints like /quantum-matrix-calculation or /predict-life-path.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://entropic-api.onrender.com/openapi.json",
+    "is_user_authenticated": false
+  },
+  "logo_url": "https://openai.com/favicon.ico",
+  "contact_email": "kovasangel@gmail.com",
+  "legal_info_url": "https://example.com/legal"
+}

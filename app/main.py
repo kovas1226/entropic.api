@@ -1599,4 +1599,9 @@ def root():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+from fastapi.responses import FileResponse
+
+@app.get("/.well-known/ai-plugin.json", include_in_schema=False)
+def serve_manifest():
+    return FileResponse(".well-known/ai-plugin.json", media_type="application/json")
 
