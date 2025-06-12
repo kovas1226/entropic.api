@@ -18,6 +18,12 @@ from .quantum_sim import (
 
 app = FastAPI(title="Symbolic Quantum API", version="1.0")
 
+@app.get("/")
+def root():
+    return {
+        "message": "Quantum Entropic API is live. Visit /docs for OpenAPI UI."
+    }
+
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
     "000": {"label": "origin", "tone": "neutral", "category": "beginning"},
