@@ -1,21 +1,34 @@
+import pytest
+pytest.importorskip("httpx")
 from fastapi.testclient import TestClient
 from app.main import app
 
 client = TestClient(app)
 
-def test_root():
-    response = client.get("/")
+def test_spread_endpoint():
+    response = client.get("/spread")
     assert response.status_code == 200
+    data = response.json()
+    assert set(data.keys()) == {"root", "challenge", "guide"}
+    for v in data.values():
+        assert "bits" in v and "symbol" in v and "entropy" in v
 
-def test_quantum_matrix_calculation():
-    response = client.post("/quantum-matrix-calculation", json={"entropy_seed": "test-seed"})
+def test_intent_endpoint():
+    response = client.post("/intent", json={"intent": "emergence"})
+    assert response.status_code == 200
+    data = response.json()
+    assert set(data.keys()) == {"root", "challenge", "guide"}
+
+def test_meaning_endpoint():
+    response = client.get("/meaning/000")
     assert response.status_code == 200
     assert "eigenvalues" in response.json()
+    assert response.json()["label"] == "origin"
 
-def test_quantum_wave_interference():
-    response = client.post("/quantum-wave-interference", json={
-        "frequencies": [1.0, 2.0, 3.0],
-        "time_factor": 0.5
-    })
+def test_ask_endpoint():
+    response = client.post("/ask", json={"question": "What is blocking me?"})
     assert response.status_code == 200
+    body = response.json()
     assert "interference_pattern" in response.json()
+    assert "spread" in body
+    assert "summary" in body
