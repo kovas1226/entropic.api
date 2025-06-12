@@ -24,6 +24,9 @@ from .quantum_sim import (
 )
 
 app = FastAPI(title="Symbolic Quantum API", version="1.0")
+@app.get("/")
+def root():
+    return {"status": "Quantum API is online."}
 
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
