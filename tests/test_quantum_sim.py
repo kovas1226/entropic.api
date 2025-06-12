@@ -15,6 +15,8 @@ from app.quantum_sim import (
     ghz_circuit,
     grover_search,
     teleport,
+    visualize_probabilities,
+    bloch_coordinates,
 )
 
 
@@ -101,3 +103,27 @@ def test_teleportation():
     amp1 = final_state[4 + idx]
     assert abs(amp0 - 1 / math.sqrt(2)) < 1e-6
     assert abs(amp1 - 1 / math.sqrt(2)) < 1e-6
+
+
+def test_depolarizing_channel():
+    dc = DensityMatrixCircuit(1)
+    dc.apply_gate(X, 0)
+    dc.apply_depolarizing(1.0, 0)
+    # Fully mixed -> diagonal elements 0.5
+    assert abs(dc.rho[0][0] - 0.5) < 1e-12
+    assert abs(dc.rho[1][1] - 0.5) < 1e-12
+
+
+def test_visualization_helpers():
+    qc = QuantumCircuit(1)
+    qc.apply_gate(H, 0)
+    import io, sys as _sys
+    buf = io.StringIO()
+    _stdout = _sys.stdout
+    _sys.stdout = buf
+    visualize_probabilities(qc.state)
+    _sys.stdout = _stdout
+    out = buf.getvalue().strip().splitlines()
+    assert len(out) == 2
+    x, y, z = bloch_coordinates(qc.state)
+    assert abs(x - 2.0) < 1e-12 and abs(y) < 1e-12 and abs(z) < 1e-12
