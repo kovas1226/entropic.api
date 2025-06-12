@@ -1,5 +1,14 @@
 # Simple quantum circuit simulator without external dependencies
 """Quantum Circuit Simulator.
+Module relationship:
+
+[ quantum_sim.py ] ← core simulator
+        ↑
+        |
+[   api.py    ] ← symbolic API using simulation tools
+        ↑
+        |
+[ main.py ] ← FastAPI entrypoint
 
 This module implements a lightweight quantum circuit simulator designed for
 educational purposes and quick algorithm prototyping.  The implementation is
