@@ -5,7 +5,13 @@ import math
 from app.quantum_sim import (
     QuantumCircuit,
     DensityMatrixCircuit,
-    H, X, CNOT, TOFFOLI, CRx, CRz,
+    H,
+    X,
+    Z,
+    CNOT,
+    TOFFOLI,
+    CRx,
+    CRz,
     is_unitary,
     von_neumann_entropy,
     amplitude_damping,
@@ -17,6 +23,8 @@ from app.quantum_sim import (
     teleport,
     visualize_probabilities,
     bloch_coordinates,
+    amplitude_amplification,
+    phase_estimation,
 )
 
 
@@ -127,3 +135,15 @@ def test_visualization_helpers():
     assert len(out) == 2
     x, y, z = bloch_coordinates(qc.state)
     assert abs(x - 2.0) < 1e-12 and abs(y) < 1e-12 and abs(z) < 1e-12
+
+
+def test_amplification_and_phase_estimation():
+    def oracle(circ):
+        circ.apply_gate(Z, 0)
+
+    out, state = amplitude_amplification(oracle, 1, 1)
+    assert out in {0, 1}
+    assert abs(sum(abs(a) ** 2 for a in state) - 1.0) < 1e-12
+
+    phase, _ = phase_estimation([[1, 0], [0, -1]], [0, 1], 1)
+    assert phase in {0, 1}

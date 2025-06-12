@@ -24,20 +24,6 @@ from .quantum_sim import (
 )
 
 app = FastAPI(title="Symbolic Quantum API", version="1.0")
-from fastapi.responses import HTMLResponse
-
-@app.get("/", response_class=HTMLResponse)
-def root():
-    return """
-    <html>
-      <head><title>Quantum API</title></head>
-      <body style="font-family: sans-serif;">
-        <h1>✨ Quantum API is Online ✨</h1>
-        <p>Try the <a href="/docs">API docs</a> or POST to <code>/perform</code>.</p>
-      </body>
-    </html>
-    """
-
 
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
@@ -564,6 +550,144 @@ def visualize_action(gates: List[GateOp]):
     return {"chart": buf}
 
 
+@register_action("life_path", kind="quantum")
+def life_path_action():
+    """Provide symbolic guidance about one's path using a GHZ state."""
+    qc = ghz_circuit(3)
+    entropy = von_neumann_entropy(qc.state, [0, 1])
+    bits = "".join(str(qc.measure(i)) for i in range(3))
+    sym = get_symbol(bits)
+    meaning = f"Your path aligns with '{sym['label']}' carrying {sym['tone']} {sym['category']} energy."
+    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
+@register_action("past_present_future", kind="quantum")
+def past_present_future_action():
+    """Return symbols representing past, present, and future."""
+    result: Dict[str, Dict[str, Any]] = {}
+    for role in ["past", "present", "future"]:
+        qc = QuantumCircuit(3)
+        qaoa_layer(qc, random.random(), random.random(), [(0, 1), (1, 2)])
+        entropy = von_neumann_entropy(qc.state, range(3))
+        bits = "".join(str(qc.measure(i)) for i in range(3))
+        result[role] = {
+            "bits": bits,
+            "symbol": get_symbol(bits),
+            "entropy": entropy,
+        }
+    return result
+
+
+@register_action("randaunaut", kind="quantum")
+def randaunaut_action():
+    """Generate random coordinates through quantum sampling."""
+    qc = QuantumCircuit(3)
+    for q in range(3):
+        qc.apply_gate(H, q)
+    entropy = von_neumann_entropy(qc.state, range(3))
+    bits = "".join(str(qc.measure(i)) for i in range(3))
+    sym = get_symbol(bits)
+    x = int(bits[:2], 2)
+    y = int(bits[1:], 2)
+    meaning = f"Explore coordinates ({x},{y}) under the sign of '{sym['label']}'."
+    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
+@register_action("divine_coords", kind="quantum")
+def divine_coords_action():
+    """Use phase estimation to produce guidance coordinates."""
+    phase, state = phase_estimation([[1, 0], [0, -1]], [1, 0], 3)
+    qc = QuantumCircuit(3)
+    qc.state = state[:]
+    bit = qc.measure(2)
+    bits = f"{phase & 1}{(phase >> 1) & 1}{bit}"
+    sym = get_symbol(bits)
+    entropy = von_neumann_entropy(qc.state, range(3))
+    meaning = f"Coordinates point toward '{sym['label']}' energies."
+    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
+@register_action("predict", kind="quantum")
+def predict_action():
+    """Predict an upcoming trend using Grover search."""
+    outcome, _ = grover_search([3], 2, iterations=1)
+    bits = f"{outcome:03b}"
+    sym = get_symbol(bits)
+    entropy = 0.0
+    meaning = f"Upcoming events echo '{sym['label']}' in a {sym['tone']} way."
+    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
+@register_action("reveal", kind="quantum")
+def reveal_action():
+    """Reveal hidden aspects via teleportation."""
+    m, state = teleport([1 / math.sqrt(2), 1 / math.sqrt(2)])
+    qc = QuantumCircuit(3)
+    qc.state = state[:]
+    bit = qc.measure(2)
+    bits = f"{m[0]}{m[1]}{bit}"
+    sym = get_symbol(bits)
+    entropy = von_neumann_entropy(qc.state, range(3))
+    meaning = f"Revealed symbol '{sym['label']}' carries {sym['tone']} truth."
+    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
+@register_action("warn", kind="quantum")
+def warn_action():
+    """Warn about a potential risk using phase damping."""
+    dc = DensityMatrixCircuit(1)
+    dc.apply_gate(H, 0)
+    dc.apply_phase_damping(0.6, 0)
+    entropy = von_neumann_entropy([dc.rho[0][0], dc.rho[1][1]], [0])
+    bit = dc.measure(0)
+    bits = f"00{bit}"
+    sym = get_symbol(bits)
+    meaning = f"Caution: '{sym['label']}' energies grow {sym['tone']}."
+    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
+@register_action("insight", kind="quantum")
+def insight_action():
+    """Gain insight by running amplitude amplification."""
+    def oracle(c: QuantumCircuit):
+        c.apply_gate(Z, 0)
+
+    outcome, _ = amplitude_amplification(oracle, 1, 1)
+    bits = f"00{outcome}"
+    sym = get_symbol(bits)
+    entropy = 0.0
+    meaning = f"Insight arises as '{sym['label']}' within {sym['category']}."
+    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
+@register_action("symbolize", kind="quantum")
+def symbolize_action():
+    """Generate a symbol from QAOA evolution."""
+    qc = QuantumCircuit(3)
+    for q in range(3):
+        qc.apply_gate(H, q)
+    qaoa_layer(qc, 0.5, 0.4, [(0, 1), (1, 2)])
+    entropy = von_neumann_entropy(qc.state, range(3))
+    bits = "".join(str(qc.measure(i)) for i in range(3))
+    sym = get_symbol(bits)
+    meaning = f"Symbol '{sym['label']}' reflects {sym['category']} in {sym['tone']} tones."
+    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
+@register_action("scrye", kind="quantum")
+def scrye_action():
+    """Scrutinize the quantum state to produce a guiding symbol."""
+    qc = QuantumCircuit(3)
+    qc.apply_gate(H, 0)
+    qc.apply_gate(CNOT, [1, 0])
+    qc.apply_gate(CNOT, [2, 1])
+    entropy = von_neumann_entropy(qc.state, range(3))
+    bits = "".join(str(qc.measure(i)) for i in range(3))
+    sym = get_symbol(bits)
+    meaning = f"The mirror shows '{sym['label']}' with {sym['tone']} resonance."
+    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
 @app.post("/ask")
 def ask(req: AskRequest):
     return ask_action(req.question, req.user_id, req.seed)
@@ -590,7 +714,7 @@ def test_actions():
                 results[name] = fn([0])
             elif name == "ask":
                 results[name] = fn("test")
-            elif name in {"spread", "reflect", "analyze", "answer", "teleport_thought", "dream", "summon", "judge_consistency", "phase_read"}:
+            elif name in {"spread", "reflect", "analyze", "answer", "teleport_thought", "dream", "summon", "judge_consistency", "phase_read", "life_path", "past_present_future", "randaunaut", "divine_coords", "predict", "reveal", "warn", "insight", "symbolize", "scrye"}:
                 results[name] = fn()
             elif name == "contemplate":
                 results[name] = fn("test")

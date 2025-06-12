@@ -126,7 +126,7 @@ but it is carefully organised into coherent sections for easier navigation.
 import random
 import math
 import cmath
-from typing import Callable, Dict, List, Sequence, Tuple, Optional
+from typing import Callable, Dict, List, Sequence, Tuple, Optional, Any
 
 # Utility checks
 
@@ -1054,6 +1054,94 @@ def vqe_expectation(state: Sequence[complex], h_terms: Sequence[Tuple[List[List[
                 contrib += state[i].conjugate() * expanded[i][j] * state[j]
         total += contrib
     return total.real
+
+
+def symbolic_measure(state: List[complex], bits: int = 3) -> Dict[str, Any]:
+    """Return symbolic interpretation for ``state`` measured on ``bits`` qubits."""
+    from .api import get_symbol  # local import to avoid circular dependency
+
+    n = int(math.log2(len(state)))
+    m = min(bits, n)
+    qc = QuantumCircuit(n)
+    qc.state = list(state)
+    entropy = von_neumann_entropy(qc.state, list(range(m)))
+    out = ''.join(str(qc.measure(i)) for i in range(m))
+    out = out.ljust(bits, '0')
+    sym = get_symbol(out)
+    meaning = f"Symbol '{sym['label']}' radiates {sym['tone']} {sym['category']} energy."
+    return {"bits": out, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
+def entangle_meaning(seed: Optional[int] = None) -> Dict[str, Any]:
+    """Generate an entangled state and interpret it symbolically."""
+    from .api import get_symbol
+
+    if seed is not None:
+        random.seed(seed)
+    qc = ghz_circuit(3)
+    entropy = von_neumann_entropy(qc.state, [0, 1])
+    bits = ''.join(str(qc.measure(i)) for i in range(3))
+    sym = get_symbol(bits)
+    meaning = f"Entanglement reveals '{sym['label']}' within {sym['category']} patterns."
+    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
+def simulate_and_scrye(gates: Sequence[Any], seed: Optional[int] = None) -> Dict[str, Any]:
+    """Simulate ``gates`` and return a symbolic measurement of the outcome."""
+    if seed is not None:
+        random.seed(seed)
+    n = max((max(op.qubits if hasattr(op, 'qubits') else op['qubits']) for op in gates), default=-1) + 1
+    n = max(n, 1)
+    qc = QuantumCircuit(n)
+    for op in gates:
+        name = getattr(op, 'name', op['name'])
+        qubits = getattr(op, 'qubits', op['qubits'])
+        params = getattr(op, 'params', op.get('params'))
+        gate = gate_from_name(name, params)
+        qc.apply_gate(gate, qubits)
+    return symbolic_measure(qc.state, min(3, n))
+
+
+def generate_random_path(seed: Optional[int] = None) -> Dict[str, Any]:
+    """Produce a symbolic path from random quantum steps."""
+    from .api import get_symbol
+
+    if seed is not None:
+        random.seed(seed)
+    path: List[str] = []
+    qc = QuantumCircuit(3)
+    entropy = 0.0
+    bits = ""
+    for _ in range(3):
+        for q in range(3):
+            if random.random() < 0.5:
+                qc.apply_gate(H, q)
+        if random.random() < 0.5:
+            ctrl = random.randint(0, 2)
+            tgt = (ctrl + random.randint(1, 2)) % 3
+            qc.apply_gate(CNOT, [tgt, ctrl])
+        entropy = von_neumann_entropy(qc.state, range(3))
+        bits = ''.join(str(qc.measure(i)) for i in range(3))
+        path.append(get_symbol(bits)["label"])
+        qc = QuantumCircuit(3)
+    sym = get_symbol(bits)
+    meaning = f"A path of {' -> '.join(path)} culminates in '{sym['label']}'."
+    return {"path": path, "bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+
+
+def dream_state(gamma: float = 0.4, beta: float = 0.7) -> Dict[str, Any]:
+    """Run a single QAOA layer and interpret the dreamlike outcome."""
+    from .api import get_symbol
+
+    qc = QuantumCircuit(3)
+    for q in range(3):
+        qc.apply_gate(H, q)
+    qaoa_layer(qc, gamma, beta, [(0, 1), (1, 2), (2, 0)])
+    entropy = von_neumann_entropy(qc.state, range(3))
+    bits = ''.join(str(qc.measure(i)) for i in range(3))
+    sym = get_symbol(bits)
+    meaning = f"Dream state evokes '{sym['label']}' guiding {sym['category']}."
+    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
 def run_demo():
@@ -2494,3 +2582,4 @@ X21hbmlmZXN0KCk6CiAgICByZXR1cm4gRmlsZVJlc3BvbnNlKCIud2VsbC1rbm93bi9haS1wbHVn
 aW4uanNvbiIsIG1lZGlhX3R5cGU9ImFwcGxpY2F0aW9uL2pzb24iKQoK
 """
 LEGACY_MANUAL = _b64.b64decode(LEGACY_MANUAL_B64.encode()).decode()
+

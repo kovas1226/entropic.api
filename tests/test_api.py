@@ -20,6 +20,16 @@ client = TestClient(app)
         "summon",
         "judge_consistency",
         "phase_read",
+        "life_path",
+        "past_present_future",
+        "randaunaut",
+        "divine_coords",
+        "predict",
+        "reveal",
+        "warn",
+        "insight",
+        "symbolize",
+        "scrye",
     ],
 )
 def test_actions_available(name):
@@ -42,6 +52,16 @@ def test_perform_answer():
         ("summon", {"bits", "symbol", "entropy"}),
         ("judge_consistency", {"constant", "balanced"}),
         ("phase_read", {"phase_bits", "phase", "symbol"}),
+        ("life_path", {"bits", "symbol", "entropy", "meaning"}),
+        ("past_present_future", {"past", "present", "future"}),
+        ("randaunaut", {"bits", "symbol", "entropy", "meaning"}),
+        ("divine_coords", {"bits", "symbol", "entropy", "meaning"}),
+        ("predict", {"bits", "symbol", "entropy", "meaning"}),
+        ("reveal", {"bits", "symbol", "entropy", "meaning"}),
+        ("warn", {"bits", "symbol", "entropy", "meaning"}),
+        ("insight", {"bits", "symbol", "entropy", "meaning"}),
+        ("symbolize", {"bits", "symbol", "entropy", "meaning"}),
+        ("scrye", {"bits", "symbol", "entropy", "meaning"}),
     ],
 )
 def test_perform_new_actions(intent, expect_keys):
@@ -96,5 +116,7 @@ def test_symbols_endpoint():
     resp = client.get("/symbols")
     assert resp.status_code == 200
     assert "000" in resp.json()
+
+
 
 
