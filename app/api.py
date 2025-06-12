@@ -24,9 +24,20 @@ from .quantum_sim import (
 )
 
 app = FastAPI(title="Symbolic Quantum API", version="1.0")
-@app.get("/")
+from fastapi.responses import HTMLResponse
+
+@app.get("/", response_class=HTMLResponse)
 def root():
-    return {"status": "Quantum API is online."}
+    return """
+    <html>
+      <head><title>Quantum API</title></head>
+      <body style="font-family: sans-serif;">
+        <h1>✨ Quantum API is Online ✨</h1>
+        <p>Try the <a href="/docs">API docs</a> or POST to <code>/perform</code>.</p>
+      </body>
+    </html>
+    """
+
 
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
