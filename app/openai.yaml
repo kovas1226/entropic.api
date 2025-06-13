@@ -28,7 +28,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
         422:
           description: "Validation Error"
           content:
@@ -45,7 +45,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
   /spread:
     get:
       summary: "Spread"
@@ -64,7 +64,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
         422:
           description: "Validation Error"
           content:
@@ -87,7 +87,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
         422:
           description: "Validation Error"
           content:
@@ -110,7 +110,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
         422:
           description: "Validation Error"
           content:
@@ -133,7 +133,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
         422:
           description: "Validation Error"
           content:
@@ -156,7 +156,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
         422:
           description: "Validation Error"
           content:
@@ -179,7 +179,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
         422:
           description: "Validation Error"
           content:
@@ -196,7 +196,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
   /log:
     get:
       summary: "Log"
@@ -207,7 +207,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
   /meaning/{bits}:
     get:
       summary: "Meaning"
@@ -227,7 +227,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
         422:
           description: "Validation Error"
           content:
@@ -250,7 +250,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
         422:
           description: "Validation Error"
           content:
@@ -268,7 +268,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
   /test-actions:
     get:
       summary: "Test Actions"
@@ -280,7 +280,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
   /perform:
     post:
       summary: "Perform"
@@ -297,7 +297,7 @@ paths:
           content:
             application/json:
               schema:
-              type: object
+                type: "object"
         422:
           description: "Validation Error"
           content:
