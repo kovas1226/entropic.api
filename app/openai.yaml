@@ -1,0 +1,442 @@
+openapi: "3.1.0"
+info:
+  title: "Symbolic Quantum API"
+  description: "This API interprets quantum simulation results as symbolic archetypes."
+  version: "1.0"
+servers:
+  -
+    url: "https://entropic-api.onrender.com"
+paths:
+  /upload-symbols:
+    post:
+      summary: "Upload Symbols"
+      operationId: "upload_symbols_upload_symbols_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Data"
+              type: "object"
+              additionalProperties:
+                type: "object"
+                additionalProperties:
+                  type: "string"
+        required: True
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+        422:
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /symbols:
+    get:
+      summary: "Symbols"
+      operationId: "symbols_symbols_get"
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+  /spread:
+    get:
+      summary: "Spread"
+      operationId: "spread_spread_get"
+      parameters:
+        -
+          required: False
+          schema:
+            title: "Seed"
+            type: "integer"
+          name: "seed"
+          in: "query"
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+        422:
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /intent:
+    post:
+      summary: "Intent"
+      operationId: "intent_intent_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IntentRequest"
+        required: True
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+        422:
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /simulate:
+    post:
+      summary: "Simulate"
+      operationId: "simulate_simulate_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CircuitRequest"
+        required: True
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+        422:
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /density:
+    post:
+      summary: "Density"
+      operationId: "density_density_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DensityRequest"
+        required: True
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+        422:
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /interpret:
+    post:
+      summary: "Interpret"
+      operationId: "interpret_interpret_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CircuitRequest"
+        required: True
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+        422:
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /entropy:
+    post:
+      summary: "Entropy"
+      operationId: "entropy_entropy_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntropyRequest"
+        required: True
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+        422:
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /trace:
+    get:
+      summary: "Trace"
+      operationId: "trace_trace_get"
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+  /log:
+    get:
+      summary: "Log"
+      operationId: "log_log_get"
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+  /meaning/{bits}:
+    get:
+      summary: "Meaning"
+      description: "Return symbolic data for a specific bitstring."
+      operationId: "meaning_meaning__bits__get"
+      parameters:
+        -
+          required: True
+          schema:
+            title: "Bits"
+            type: "string"
+          name: "bits"
+          in: "path"
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+        422:
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /ask:
+    post:
+      summary: "Ask"
+      operationId: "ask_ask_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AskRequest"
+        required: True
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+        422:
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /actions:
+    get:
+      summary: "List Actions"
+      description: "Return all registered action names and their types."
+      operationId: "list_actions_actions_get"
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+  /test-actions:
+    get:
+      summary: "Test Actions"
+      description: "Invoke each registered action with minimal defaults."
+      operationId: "test_actions_test_actions_get"
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+  /perform:
+    post:
+      summary: "Perform"
+      operationId: "perform_perform_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IntentRequest"
+        required: True
+      responses:
+        200:
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+
+        422:
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+components:
+  schemas:
+    AskRequest:
+      title: "AskRequest"
+      required:
+        - "question"
+      type: "object"
+      properties:
+        question:
+          title: "Question"
+          type: "string"
+        user_id:
+          title: "User Id"
+          type: "string"
+        seed:
+          title: "Seed"
+          type: "integer"
+    CircuitRequest:
+      title: "CircuitRequest"
+      required:
+        - "gates"
+      type: "object"
+      properties:
+        gates:
+          title: "Gates"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/GateOp"
+        seed:
+          title: "Seed"
+          type: "integer"
+        use_previous:
+          title: "Use Previous"
+          type: "boolean"
+          default: False
+    DensityRequest:
+      title: "DensityRequest"
+      required:
+        - "gates"
+      type: "object"
+      properties:
+        gates:
+          title: "Gates"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/GateOp"
+        seed:
+          title: "Seed"
+          type: "integer"
+        use_previous:
+          title: "Use Previous"
+          type: "boolean"
+          default: False
+        noise:
+          title: "Noise"
+          type: "object"
+          additionalProperties:
+            type: "number"
+    EntropyRequest:
+      title: "EntropyRequest"
+      required:
+        - "subsystem"
+      type: "object"
+      properties:
+        subsystem:
+          title: "Subsystem"
+          type: "array"
+          items:
+            type: "integer"
+    GateOp:
+      title: "GateOp"
+      required:
+        - "name"
+        - "qubits"
+      type: "object"
+      properties:
+        name:
+          title: "Name"
+          type: "string"
+        qubits:
+          title: "Qubits"
+          type: "array"
+          items:
+            type: "integer"
+        params:
+          title: "Params"
+          type: "array"
+          items:
+            type: "number"
+    HTTPValidationError:
+      title: "HTTPValidationError"
+      type: "object"
+      properties:
+        detail:
+          title: "Detail"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ValidationError"
+    IntentRequest:
+      title: "IntentRequest"
+      required:
+        - "intent"
+      type: "object"
+      properties:
+        intent:
+          title: "Intent"
+          type: "string"
+        params:
+          title: "Params"
+          type: "object"
+        seed:
+          title: "Seed"
+          type: "integer"
+    ValidationError:
+      title: "ValidationError"
+      required:
+        - "loc"
+        - "msg"
+        - "type"
+      type: "object"
+      properties:
+        loc:
+          title: "Location"
+          type: "array"
+          items:
+            anyOf:
+              -
+                type: "string"
+              -
+                type: "integer"
+        msg:
+          title: "Message"
+          type: "string"
+        type:
+          title: "Error Type"
+          type: "string"

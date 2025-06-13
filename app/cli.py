@@ -1,64 +1,45 @@
 import argparse
-from .quantum_sim import (
-    QuantumCircuit,
-    DensityMatrixCircuit,
-    H,
-    CNOT,
-    qft,
-    visualize_probabilities,
+import math
+
+from .api import (
+    example_bell_and_qft,
     grover_search,
+    teleport,
     ghz_circuit,
-    amplitude_damping,
+    visualize_probabilities,
+    run_demo,
 )
 
 
-def run_bell(n_qubits: int = 2):
-    qc = QuantumCircuit(n_qubits)
-    qc.apply_gate(H, 0)
-    qc.apply_gate(CNOT, [1, 0])
-    print("Bell state after measurement:")
-    print(qc.measure(0), qc.measure(1))
-
-
-def run_qft(n_qubits: int = 3):
-    qc = QuantumCircuit(n_qubits)
-    for q in range(n_qubits):
-        if q % 2 == 0:
-            qc.apply_gate(H, q)
-    qft(qc)
-    visualize_probabilities(qc.state)
-
-
-def run_grover():
-    qc_result, state = grover_search([3], 2)
-    print("Grover search outcome:", qc_result)
-    visualize_probabilities(state)
-
-
-def run_decoherence():
-    dc = DensityMatrixCircuit(2)
-    dc.apply_gate(H, 0)
-    dc.apply_gate(CNOT, [1, 0])
-    dc.apply_amplitude_damping(0.3, 0)
-    visualize_probabilities([dc.rho[i][i].real for i in range(4)])
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Simple quantum simulator CLI")
-    parser.add_argument(
-        "circuit",
-        choices=["bell", "qft", "grover", "decoherence"],
-        help="Circuit to run",
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Command line utilities for the symbolic quantum API"
     )
-    args = parser.parse_args()
-    if args.circuit == "bell":
-        run_bell()
-    elif args.circuit == "qft":
-        run_qft()
-    elif args.circuit == "grover":
-        run_grover()
-    elif args.circuit == "decoherence":
-        run_decoherence()
+    sub = parser.add_subparsers(dest="command")
+    sub.add_parser("bell", help="Run Bell + QFT example")
+    sub.add_parser("grover", help="Grover search demo")
+    sub.add_parser("teleport", help="Teleport |+> state")
+    sub.add_parser("ghz", help="Prepare GHZ state")
+    sub.add_parser("demo", help="Run combined demo")
+    args = parser.parse_args(argv)
+
+    if args.command == "bell":
+        results, state = example_bell_and_qft()
+        print("Bell measurement:", results)
+        visualize_probabilities(state)
+    elif args.command == "grover":
+        sol, state = grover_search([3], 2, iterations=1)
+        print("Grover result bits:", sol)
+        visualize_probabilities(state)
+    elif args.command == "teleport":
+        m, final = teleport([1 / math.sqrt(2), 1 / math.sqrt(2)])
+        print("Bell outcomes:", m)
+        visualize_probabilities(final)
+    elif args.command == "ghz":
+        circ = ghz_circuit(3)
+        visualize_probabilities(circ.state)
+    else:
+        run_demo()
 
 
 if __name__ == "__main__":
