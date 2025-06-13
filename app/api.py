@@ -1067,7 +1067,7 @@ def symbolic_measure(state: List[complex], bits: int = 3) -> Dict[str, Any]:
     out = ''.join(str(qc.measure(i)) for i in range(m))
     out = out.ljust(bits, '0')
     sym = get_symbol(out)
-    meaning = interpret_symbol(sym)
+    meaning = get_meaning(sym, entropy)
     return {"bits": out, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -1080,7 +1080,7 @@ def entangle_meaning(seed: Optional[int] = None) -> Dict[str, Any]:
     entropy = von_neumann_entropy(qc.state, [0, 1])
     bits = ''.join(str(qc.measure(i)) for i in range(3))
     sym = get_symbol(bits)
-    meaning = interpret_symbol(sym, "Entangled insights surface.")
+    meaning = get_meaning(sym, entropy, "Entangled insights surface.")
     return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -1122,7 +1122,7 @@ def generate_random_path(seed: Optional[int] = None) -> Dict[str, Any]:
         path.append(get_symbol(bits)["label"])
         qc = QuantumCircuit(3)
     sym = get_symbol(bits)
-    meaning = interpret_symbol(sym, f"A path of {' -> '.join(path)} culminates here.")
+    meaning = get_meaning(sym, entropy, f"A path of {' -> '.join(path)} culminates here.")
     return {"path": path, "bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -1136,7 +1136,7 @@ def dream_state(gamma: float = 0.4, beta: float = 0.7) -> Dict[str, Any]:
     entropy = von_neumann_entropy(qc.state, range(3))
     bits = ''.join(str(qc.measure(i)) for i in range(3))
     sym = get_symbol(bits)
-    meaning = interpret_symbol(sym, "Dream imagery surfaces guidance.")
+    meaning = get_meaning(sym, entropy, "Dream imagery surfaces guidance.")
     return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -2596,6 +2596,19 @@ app = FastAPI(
         "This API interprets quantum simulation results as symbolic archetypes."
     ),
 )
+from fastapi.responses import HTMLResponse
+
+@app.get("/", response_class=HTMLResponse)
+def root():
+    return """
+    <html>
+      <head><title>Quantum API</title></head>
+      <body style="font-family: sans-serif;">
+        <h1>✨ Quantum API is Online ✨</h1>
+        <p>Try <a href="/docs">/docs</a> or POST to <code>/perform</code> for symbolic actions.</p>
+      </body>
+    </html>
+    """
 
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
@@ -2725,6 +2738,16 @@ def _weighted_choice(options: List[str], counts: Dict[str, int]) -> str:
             return opt
         r -= w
     return random.choice(options)
+
+
+def get_meaning(symbol: Dict[str, str], entropy: float, context: str = "") -> str:
+    """Return a poetic interpretation of ``symbol`` adjusted by ``entropy``."""
+    base = interpret_symbol(symbol, context)
+    if entropy > 0.8:
+        return f"{base} Many forces swirl around you; trust your inner compass."
+    if entropy < 0.3:
+        return f"{base} The way forward feels clear and steady."
+    return f"{base} Possibilities are still taking shape."
 
 
 def symbolic_fallback(action: str, error: Exception) -> Dict[str, Any]:
@@ -3149,7 +3172,7 @@ def life_path_action():
     entropy = von_neumann_entropy(qc.state, [0, 1])
     bits = "".join(str(qc.measure(i)) for i in range(3))
     sym = get_symbol(bits)
-    meaning = interpret_symbol(sym, "Your life path takes shape.")
+    meaning = get_meaning(sym, entropy, "Your life path takes shape.")
     return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -3167,7 +3190,7 @@ def past_present_future_action():
             "bits": bits,
             "symbol": sym,
             "entropy": entropy,
-            "meaning": interpret_symbol(sym, role.capitalize()),
+            "meaning": get_meaning(sym, entropy, role.capitalize()),
         }
     return result
 
@@ -3183,7 +3206,7 @@ def randaunaut_action():
     sym = get_symbol(bits)
     x = int(bits[:2], 2)
     y = int(bits[1:], 2)
-    meaning = interpret_symbol(sym, f"Explore coordinates ({x},{y}).")
+    meaning = get_meaning(sym, entropy, f"Explore coordinates ({x},{y}).")
     return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -3197,7 +3220,7 @@ def divine_coords_action():
     bits = f"{phase & 1}{(phase >> 1) & 1}{bit}"
     sym = get_symbol(bits)
     entropy = von_neumann_entropy(qc.state, range(3))
-    meaning = interpret_symbol(sym, "Coordinates indicate a shift.")
+    meaning = get_meaning(sym, entropy, "Coordinates indicate a shift.")
     return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -3208,7 +3231,7 @@ def predict_action():
     bits = f"{outcome:03b}"
     sym = get_symbol(bits)
     entropy = 0.0
-    meaning = interpret_symbol(sym, "Upcoming trends gather energy.")
+    meaning = get_meaning(sym, entropy, "Upcoming trends gather energy.")
     return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -3222,7 +3245,7 @@ def reveal_action():
     bits = f"{m[0]}{m[1]}{bit}"
     sym = get_symbol(bits)
     entropy = von_neumann_entropy(qc.state, range(3))
-    meaning = interpret_symbol(sym, "Hidden truths emerge.")
+    meaning = get_meaning(sym, entropy, "Hidden truths emerge.")
     return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -3236,7 +3259,7 @@ def warn_action():
     bit = dc.measure(0)
     bits = f"00{bit}"
     sym = get_symbol(bits)
-    meaning = interpret_symbol(sym, "Take caution moving forward.")
+    meaning = get_meaning(sym, entropy, "Take caution moving forward.")
     return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -3250,7 +3273,7 @@ def insight_action():
     bits = f"00{outcome}"
     sym = get_symbol(bits)
     entropy = 0.0
-    meaning = interpret_symbol(sym, "Insight surfaces within you.")
+    meaning = get_meaning(sym, entropy, "Insight surfaces within you.")
     return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -3264,7 +3287,7 @@ def symbolize_action():
     entropy = von_neumann_entropy(qc.state, range(3))
     bits = "".join(str(qc.measure(i)) for i in range(3))
     sym = get_symbol(bits)
-    meaning = interpret_symbol(sym, "Symbols mirror your state.")
+    meaning = get_meaning(sym, entropy, "Symbols mirror your state.")
     return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
@@ -3278,7 +3301,7 @@ def scrye_action():
     entropy = von_neumann_entropy(qc.state, range(3))
     bits = "".join(str(qc.measure(i)) for i in range(3))
     sym = get_symbol(bits)
-    meaning = interpret_symbol(sym, "A guiding reflection appears.")
+    meaning = get_meaning(sym, entropy, "A guiding reflection appears.")
     return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
 
 
