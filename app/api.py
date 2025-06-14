@@ -2594,9 +2594,14 @@ app = FastAPI(
     version="1.0",
     description=(
         "This API interprets quantum simulation results as symbolic archetypes."
-    ),
+),
 )
 from fastapi.responses import HTMLResponse
+# Serve openapi.yaml publicly for Custom GPT integration
+@app.get("/openapi.yaml", include_in_schema=False)
+def get_openapi_spec():
+    openapi_path = os.path.join(os.path.dirname(__file__), "openapi.yaml")
+    return FileResponse(openapi_path, media_type="text/yaml")
 
 @app.get("/", response_class=HTMLResponse)
 def root():
@@ -2609,7 +2614,8 @@ def root():
       </body>
     </html>
     """
-
+  # Serve openapi.yaml publicly
+ 
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
     "000": {"label": "origin", "tone": "neutral", "category": "beginning"},
