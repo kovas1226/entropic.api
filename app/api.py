@@ -2597,10 +2597,10 @@ app = FastAPI(
 ),
 )
 from fastapi.responses import HTMLResponse
-# Serve openapi.yaml publicly for Custom GPT integration
-@app.get("/openapi.yaml", include_in_schema=False)
-def get_openapi_spec():
-    openapi_path = os.path.join(os.path.dirname(__file__), "openapi.yaml")
+# Serve openai.yaml publicly for Custom GPT integration
+@app.get("/openai.yaml", include_in_schema=False)
+def get_openai_spec():
+    openai_path = os.path.join(os.path.dirname(__file__), "openai.yaml")
     return FileResponse(openapi_path, media_type="text/yaml")
 
 @app.get("/", response_class=HTMLResponse)
