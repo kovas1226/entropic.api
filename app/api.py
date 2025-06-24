@@ -256,6 +256,14 @@ def von_neumann_entropy(state: Sequence[complex], subsystem: Sequence[int]) -> f
     return entropy
 
 
+def binary_entropy(p: float) -> float:
+    """Return the binary Shannon entropy of probability ``p``."""
+    if p <= 0.0 or p >= 1.0:
+        return 0.0
+    q = 1.0 - p
+    return -p * math.log(p, 2) - q * math.log(q, 2)
+
+
 # Basic gate application routines
 
 def apply_single_qubit_gate(state: Sequence[complex], gate: Sequence[Sequence[complex]], qubit: int) -> List[complex]:
@@ -1079,25 +1087,13 @@ def entangle_meaning(seed: Optional[int] = None) -> Dict[str, Any]:
     qc = ghz_circuit(3)
     entropy = von_neumann_entropy(qc.state, [0, 1])
     bits = ''.join(str(qc.measure(i)) for i in range(3))
-    sym = get_symbol(bits)
-    meaning = get_meaning(sym, entropy, "Entangled insights surface.")
-    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+    return {"bits": bits, "entropy": entropy}
 
 
-def simulate_and_scrye(gates: Sequence[Any], seed: Optional[int] = None) -> Dict[str, Any]:
-    """Simulate ``gates`` and return a symbolic measurement of the outcome."""
-    if seed is not None:
-        random.seed(seed)
-    n = max((max(op.qubits if hasattr(op, 'qubits') else op['qubits']) for op in gates), default=-1) + 1
-    n = max(n, 1)
-    qc = QuantumCircuit(n)
-    for op in gates:
-        name = getattr(op, 'name', op['name'])
-        qubits = getattr(op, 'qubits', op['qubits'])
-        params = getattr(op, 'params', op.get('params'))
-        gate = gate_from_name(name, params)
-        qc.apply_gate(gate, qubits)
-    return symbolic_measure(qc.state, min(3, n))
+def simulate_and_scrye(topic: str, seed: Optional[int] = None) -> Dict[str, Any]:
+    """Return a FateOracle answer for ``topic``."""
+    oracle = FateOracle(seed=seed)
+    return {"bits": oracle.bits, "entropy": oracle.entropy, "answer": oracle.ask(topic)}
 
 
 def generate_random_path(seed: Optional[int] = None) -> Dict[str, Any]:
@@ -1135,9 +1131,70 @@ def dream_state(gamma: float = 0.4, beta: float = 0.7) -> Dict[str, Any]:
     qaoa_layer(qc, gamma, beta, [(0, 1), (1, 2), (2, 0)])
     entropy = von_neumann_entropy(qc.state, range(3))
     bits = ''.join(str(qc.measure(i)) for i in range(3))
-    sym = get_symbol(bits)
-    meaning = get_meaning(sym, entropy, "Dream imagery surfaces guidance.")
-    return {"bits": bits, "symbol": sym, "entropy": entropy, "meaning": meaning}
+    return {"bits": bits, "entropy": entropy}
+
+
+class FateOracle:
+    """Deterministic oracle using quantum-derived bits and entropy."""
+
+    def __init__(self, *, use_entangle: bool = False, seed: Optional[int] = None) -> None:
+        self.use_entangle = use_entangle
+        self.seed = seed
+        self._rng = random.Random(seed)
+        self.reset()
+
+    def _generate_fate_summary(self) -> str:
+        r = random.Random(int(self.bits, 2))
+        feelings = [
+            "steady", "restless", "bright", "dim", "open", "tense", "quiet", "lively"
+        ]
+        focuses = [
+            "work", "relationships", "creativity", "health", "goals", "inner life"
+        ]
+        return f"Things feel {r.choice(feelings)} around your {r.choice(focuses)}."
+
+    def _entropy_tone(self) -> str:
+        if self.entropy > 0.7:
+            return "Many possibilities are unfolding."
+        if self.entropy < 0.3:
+            return "The direction ahead looks clear."
+        return "Some uncertainty remains, yet patterns are forming."
+
+    def _init_state(self) -> None:
+        if self.use_entangle:
+            res = entangle_meaning(self.seed)
+        else:
+            if self.seed is not None:
+                random.seed(self.seed)
+            res = dream_state()
+        self.bits = res["bits"]
+        self.entropy = res["entropy"]
+        self.summary = self._generate_fate_summary()
+
+    def generate_prompt(self, question: str) -> str:
+        tone = self._entropy_tone()
+        return (
+            "You are an emotionally intelligent, intuitive AI.\n"
+            "You interpret fate from symbolic data derived from a quantum seed.\n"
+            f"Fate Summary: {self.summary}\n"
+            f"Entropy: {self.entropy:.2f} -> {tone}\n"
+            f"User asked: \"{question}\"\n"
+            "Respond like a friend. Be natural, specific, emotionally deep, and non-mystic."
+        )
+
+    def call_gpt(self, prompt: str) -> str:
+        return f"[GPT would answer: {prompt[:60]}...]"
+
+    def ask(self, question: str) -> str:
+        prompt = self.generate_prompt(question)
+        return self.call_gpt(prompt)
+
+    def expand(self, question: str) -> str:
+        prompt = self.generate_prompt(question + " Go deeper.")
+        return self.call_gpt(prompt)
+
+    def reset(self) -> None:
+        self._init_state()
 
 
 def run_demo():
@@ -2594,28 +2651,9 @@ app = FastAPI(
     version="1.0",
     description=(
         "This API interprets quantum simulation results as symbolic archetypes."
-),
+    ),
 )
-from fastapi.responses import HTMLResponse
-# Serve openai.yaml publicly for Custom GPT integration
-@app.get("/openai.yaml", include_in_schema=False)
-def get_openai_spec():
-    openai_path = os.path.join(os.path.dirname(__file__), "openai.yaml")
-    return FileResponse(openapi_path, media_type="text/yaml")
 
-@app.get("/", response_class=HTMLResponse)
-def root():
-    return """
-    <html>
-      <head><title>Quantum API</title></head>
-      <body style="font-family: sans-serif;">
-        <h1>✨ Quantum API is Online ✨</h1>
-        <p>Try <a href="/docs">/docs</a> or POST to <code>/perform</code> for symbolic actions.</p>
-      </body>
-    </html>
-    """
-  # Serve openapi.yaml publicly
- 
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
     "000": {"label": "origin", "tone": "neutral", "category": "beginning"},
@@ -2754,6 +2792,7 @@ def get_meaning(symbol: Dict[str, str], entropy: float, context: str = "") -> st
     if entropy < 0.3:
         return f"{base} The way forward feels clear and steady."
     return f"{base} Possibilities are still taking shape."
+
 
 
 def symbolic_fallback(action: str, error: Exception) -> Dict[str, Any]:
@@ -3374,6 +3413,8 @@ def _to_yaml(obj, indent=0):
             else:
                 if isinstance(v, str):
                     v = json.dumps(v)
+                elif isinstance(v, bool):
+                    v = "true" if v else "false"
                 lines.append(f"{ind}{k}: {v}")
         return "\n".join(lines)
     elif isinstance(obj, list):
@@ -3384,7 +3425,12 @@ def _to_yaml(obj, indent=0):
                 lines.append(prefix)
                 lines.append(_to_yaml(item, indent + 1))
             else:
-                val = json.dumps(item) if isinstance(item, str) else item
+                if isinstance(item, str):
+                    val = json.dumps(item)
+                elif isinstance(item, bool):
+                    val = "true" if item else "false"
+                else:
+                    val = item
                 lines.append(f"{prefix} {val}")
         return "\n".join(lines)
     else:
@@ -3402,6 +3448,23 @@ def generate_openapi_yaml(path: str = "openapi.yaml") -> None:
     )
     schema["openapi"] = "3.1.0"
     schema["servers"] = [{"url": "https://entropic-api.onrender.com"}]
+
+    # Ensure all JSON responses explicitly declare a schema of type object
+    for path_item in schema.get("paths", {}).values():
+        for method in path_item.values():
+            if not isinstance(method, dict):
+                continue
+            responses = method.get("responses", {})
+            for response in responses.values():
+                content = response.get("content", {})
+                json_content = content.get("application/json")
+                if json_content is None:
+                    continue
+                schema_obj = json_content.get("schema")
+                if not schema_obj:
+                    schema_obj = json_content["schema"] = {"type": "object"}
+                if schema_obj.get("type") == "object" and "additionalProperties" not in schema_obj:
+                    schema_obj["additionalProperties"] = True
     ordered = {
         "openapi": schema["openapi"],
         "info": schema["info"],

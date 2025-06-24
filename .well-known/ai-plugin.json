@@ -1,12 +1,9 @@
 {
   "schema_version": "v1",
-  "name_for_human": "Quantum Entropic API",
-  "name_for_model": "quantum_entropic_api",
-  "description_for_human": "Symbolic quantum engine for spreads, intentions, and symbolic interpretation.",
-  "description_for_model": "Use endpoints like /ask, /intent, /spread, and /simulate to process symbolic quantum circuits.",
-  "auth": {
-    "type": "none"
-  },
+  "name_for_human": "Madame Entropy's Quantum Symbolic Interpreter",
+  "name_for_model": "symbolic_quantum",
+  "description_for_model": "Interprets quantum simulation results as symbolic archetypes using metaphysical logic.",
+  "auth": { "type": "none" },
 "api": {
   "type": "openapi",
   "url": "https://quantum-entropic-api.onrender.com/openapi.yaml",
