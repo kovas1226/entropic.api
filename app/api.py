@@ -2636,7 +2636,7 @@ aW4uanNvbiIsIG1lZGlhX3R5cGU9ImFwcGxpY2F0aW9uL2pzb24iKQoK
 """
 LEGACY_MANUAL = _b64.b64decode(LEGACY_MANUAL_B64.encode()).decode()
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
@@ -2713,6 +2713,7 @@ def legal():
     </html>
     """
     return HTMLResponse(content=html)
+
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
     "000": {"label": "origin", "tone": "neutral", "category": "beginning"},
@@ -2784,6 +2785,100 @@ _MODIFIERS = [
     "Secret",
 ]
 
+# --- ADD THIS MODEL DEFINITION ---
+class GateOp(BaseModel):
+    name: str
+    qubits: List[int]
+    params: List[float] | None = None
+
+class LifePredictionRequest(BaseModel):
+    question: Optional[str] = None
+    user_id: Optional[str] = None
+    seed: Optional[int] = None
+    intent: Optional[str] = None
+    params: Optional[Dict[str, Any]] = None
+    gates: Optional[List[GateOp]] = None
+    use_previous: Optional[bool] = False
+    noise: Optional[Dict[str, float]] = None
+    subsystem: Optional[List[int]] = None
+    symbols: Optional[Dict[str, Dict[str, str]]] = None
+
+# --- PREDICT-LIFE ENDPOINT ---
+@app.post("/predict-life")
+def predict_life(
+    req: LifePredictionRequest = Body(...)
+):
+    # Run all calculations
+    if req.seed is not None:
+        random.seed(req.seed)
+    intent = req.intent or (resolve_intent_from_text(req.question or "") if req.question else None)
+    gates = req.gates or []
+    symbols = req.symbols or {}
+    entropy = None
+    raw_details = {}
+
+    if gates:
+        n = max((max(op.qubits) for op in gates), default=0) + 1
+        qc = QuantumCircuit(n)
+        _apply_gates(qc, gates)
+        entropy = von_neumann_entropy(qc.state, list(range(min(3, n))))
+        bits = "".join(str(qc.measure(i)) for i in range(min(3, n)))
+        sym = get_symbol(bits)
+        raw_details = {
+            "bits": bits,
+            "symbol": sym,
+            "entropy": entropy,
+            "intent": intent,
+            "gates": [op.dict() for op in gates]
+        }
+    elif symbols:
+        bits, sym = list(symbols.items())[0]
+        entropy = random.uniform(0.2, 0.8)
+        raw_details = {
+            "bits": bits,
+            "symbol": sym,
+            "entropy": entropy,
+            "intent": intent
+        }
+    else:
+        bits = "".join(random.choice("01") for _ in range(3))
+        sym = get_symbol(bits)
+        entropy = random.uniform(0.2, 0.8)
+        raw_details = {
+            "bits": bits,
+            "symbol": sym,
+            "entropy": entropy,
+            "intent": intent
+        }
+
+    # Compose the GPT prompt
+    gpt_prompt = f"""
+You are an eerily specific, intuitive, endless-life-guide friend and psychic.
+The user asked: {req.question or '[no question provided]'}
+Here is what you sense energetically and symbolically (do NOT mention these details directly, but use them as inspiration for your reading):
+
+- Intent: {raw_details.get('intent')}
+- Symbol: {raw_details.get('symbol')}
+- Bits: {raw_details.get('bits')}
+- Entropy: {raw_details.get('entropy')}
+- Gates: {raw_details.get('gates', '')}
+
+Using this, write a long, conversational, deeply personal prediction and guidance for the user. Make it as specific, uncanny, and contextually insightful as possible.  
+Never sound like a bot or refer to calculations or symbols.  
+Always ask at least one follow-up question or invitation for deeper sharing, so the conversation can continue endlessly.
+
+Your response should sound like a psychic friend who never runs out of things to say, always finds something new in the "energy", and is never generic or short.
+"""
+
+    # Here, you would call OpenAI's GPT (or your chosen model) with gpt_prompt.
+    # For demonstration, we pretend and return the prompt as the "prediction":
+    # Replace this with your GPT integration.
+    # prediction = openai_chat_completion(prompt=gpt_prompt)
+
+    # For demonstration:
+    prediction = "[[This is where GPT would write an endless, eerily specific, friend-like life prediction, inspired by the above context.]]"
+
+    return {"prediction": prediction}
 
 def get_symbol(bits: str) -> Dict[str, str]:
     """Return symbol metadata for ``bits`` generating a new entry if needed."""

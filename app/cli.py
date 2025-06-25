@@ -10,7 +10,6 @@ from .api import (
     run_demo,
 )
 
-
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Command line utilities for the symbolic quantum API"
@@ -40,7 +39,6 @@ def main(argv=None):
         visualize_probabilities(circ.state)
     else:
         run_demo()
-
 
 if __name__ == "__main__":
     main()

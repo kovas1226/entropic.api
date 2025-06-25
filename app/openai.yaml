@@ -14,44 +14,7 @@ paths:
         content:
           application/json:
             schema:
-              title: "LifePredictionRequest"
-              type: "object"
-              properties:
-                question:
-                  type: "string"
-                  description: "The user's natural-language question."
-                user_id:
-                  type: "string"
-                  description: "Optional user ID for session or context."
-                seed:
-                  type: "integer"
-                  description: "Optional integer seed for deterministic results."
-                intent:
-                  type: "string"
-                  description: "High-level intent keyword (e.g. 'emergence', 'closure', etc)."
-                params:
-                  type: "object"
-                  description: "Optional parameters for the intent."
-                gates:
-                  type: "array"
-                  items:
-                    $ref: "#/components/schemas/GateOp"
-                  description: "Gate operations for circuit simulation."
-                use_previous:
-                  type: "boolean"
-                  default: false
-                  description: "Use the previous state as input."
-                noise:
-                  type: "object"
-                  additionalProperties:
-                    type: "number"
-                  description: "Optional noise model parameters (keys: 'gamma', 'qubit', 'type')."
-                subsystem:
-                  type: "array"
-                  items:
-                    type: "integer"
-                  description: "Indices of the subsystem to compute entropy on."
-              required: []
+              $ref: "#/components/schemas/LifePredictionRequest"
       responses:
         200:
           description: "Predicted Life Situation"
@@ -62,6 +25,7 @@ paths:
                 properties:
                   prediction:
                     type: "string"
+                  # 'details' is optional and may not always be present, so make it optional
                   details:
                     type: "object"
                     additionalProperties: true
@@ -392,6 +356,61 @@ paths:
                 $ref: "#/components/schemas/HTTPValidationError"
 components:
   schemas:
+    LifePredictionRequest:
+      title: "LifePredictionRequest"
+      type: "object"
+      properties:
+        question:
+          type: "string"
+          description: "The user's natural-language question."
+        user_id:
+          type: "string"
+          description: "User ID for session or context."
+        seed:
+          type: "integer"
+          description: "Optional integer seed for deterministic results."
+        intent:
+          type: "string"
+          description: "High-level intent keyword."
+        params:
+          type: "object"
+          additionalProperties: true
+          description: "Optional parameters for the intent."
+        gates:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/GateOp"
+          description: "Gate operations for circuit simulation."
+        use_previous:
+          type: "boolean"
+          default: false
+          description: "Use the previous state as input."
+        noise:
+          type: "object"
+          additionalProperties:
+            type: "number"
+          description: "Optional noise model parameters."
+        subsystem:
+          type: "array"
+          items:
+            type: "integer"
+          description: "Indices for entropy calculation."
+        symbols:
+          type: "object"
+          additionalProperties:
+            type: "object"
+            properties:
+              label:
+                type: "string"
+              tone:
+                type: "string"
+              category:
+                type: "string"
+            required:
+              - label
+              - tone
+              - category
+          description: "Custom symbol map."
     AskRequest:
       title: "AskRequest"
       required:
