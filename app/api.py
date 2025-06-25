@@ -2659,14 +2659,14 @@ app.mount(
     name="well-known",
 )
 
-# Optional: Serve openapi.yaml statically if not auto-served
+# Serve openapi.yaml statically for Custom GPT/Plugin compatibility
 OPENAPI_YAML_PATH = os.path.join(os.path.dirname(__file__), "../app/openai.yaml")
 
 @app.get("/openapi.yaml", include_in_schema=False)
 def openapi_yaml():
     return FileResponse(OPENAPI_YAML_PATH, media_type="application/yaml")
 
-# Optional: Friendly root message for humans
+# Optional: Friendly root message for humans and plugin testers
 @app.get("/", include_in_schema=False)
 def root():
     return {"message": "Welcome to the Symbolic Quantum API! See /docs for interactive API docs."}
