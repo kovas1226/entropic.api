@@ -2640,7 +2640,7 @@ LEGACY_MANUAL = _b64.b64decode(LEGACY_MANUAL_B64.encode()).decode()
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.openapi.utils import get_openapi
-from fastapi.staticfiles import StaticFiles  # <--- Import here
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Dict, Any, Sequence, Optional
 from datetime import datetime
@@ -2652,13 +2652,24 @@ app = FastAPI(
     description="This API interprets quantum simulation results as symbolic archetypes."
 )
 
-# Serve static .well-known directory
+# Serve static .well-known directory for OpenAI plugin manifest
 app.mount(
     "/.well-known",
     StaticFiles(directory=os.path.join(os.path.dirname(__file__), "../.well-known")),
     name="well-known",
 )
 
+# Optional: Serve openapi.yaml statically if not auto-served
+OPENAPI_YAML_PATH = os.path.join(os.path.dirname(__file__), "../app/openai.yaml")
+
+@app.get("/openapi.yaml", include_in_schema=False)
+def openapi_yaml():
+    return FileResponse(OPENAPI_YAML_PATH, media_type="application/yaml")
+
+# Optional: Friendly root message for humans
+@app.get("/", include_in_schema=False)
+def root():
+    return {"message": "Welcome to the Symbolic Quantum API! See /docs for interactive API docs."}
 
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
