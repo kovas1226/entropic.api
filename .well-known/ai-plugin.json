@@ -4,11 +4,11 @@
   "name_for_model": "symbolic_quantum",
   "description_for_model": "Interprets quantum simulation results as symbolic archetypes using metaphysical logic.",
   "auth": { "type": "none" },
-"api": {
-  "type": "openapi",
-  "url": "https://quantum-entropic-api.onrender.com/openapi.yaml",
-  "is_user_authenticated": false
-},
+  "api": {
+    "type": "openapi",
+    "url": "https://entropic-api.onrender.com/openapi.yaml",
+    "is_user_authenticated": false
+  },
   "logo_url": "https://openai.com/favicon.ico",
   "contact_email": "kovasange@gmail.com",
   "legal_info_url": "https://example.com/legal"
