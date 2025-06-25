@@ -7,318 +7,7 @@ servers:
   -
     url: "https://entropic-api.onrender.com"
 paths:
-  /upload-symbols:
-    post:
-      summary: "Upload Symbols"
-      operationId: "upload_symbols_upload_symbols_post"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              title: "Data"
-              type: "object"
-              additionalProperties:
-                type: "object"
-                additionalProperties:
-                  type: "string"
-        required: true
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-        422:
-          description: "Validation Error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HTTPValidationError"
-  /symbols:
-    get:
-      summary: "Symbols"
-      operationId: "symbols_symbols_get"
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-  /spread:
-    get:
-      summary: "Spread"
-      operationId: "spread_spread_get"
-      parameters:
-        -
-          required: false
-          schema:
-            title: "Seed"
-            type: "integer"
-          name: "seed"
-          in: "query"
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-        422:
-          description: "Validation Error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HTTPValidationError"
-  /intent:
-    post:
-      summary: "Intent"
-      operationId: "intent_intent_post"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/IntentRequest"
-        required: true
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-        422:
-          description: "Validation Error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HTTPValidationError"
-  /simulate:
-    post:
-      summary: "Simulate"
-      operationId: "simulate_simulate_post"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CircuitRequest"
-        required: true
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-        422:
-          description: "Validation Error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HTTPValidationError"
-  /density:
-    post:
-      summary: "Density"
-      operationId: "density_density_post"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DensityRequest"
-        required: true
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-        422:
-          description: "Validation Error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HTTPValidationError"
-  /interpret:
-    post:
-      summary: "Interpret"
-      operationId: "interpret_interpret_post"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CircuitRequest"
-        required: true
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-        422:
-          description: "Validation Error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HTTPValidationError"
-  /entropy:
-    post:
-      summary: "Entropy"
-      operationId: "entropy_entropy_post"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/EntropyRequest"
-        required: true
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-        422:
-          description: "Validation Error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HTTPValidationError"
-  /trace:
-    get:
-      summary: "Trace"
-      operationId: "trace_trace_get"
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-  /log:
-    get:
-      summary: "Log"
-      operationId: "log_log_get"
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-  /meaning/{bits}:
-    get:
-      summary: "Meaning"
-      description: "Return symbolic data for a specific bitstring."
-      operationId: "meaning_meaning__bits__get"
-      parameters:
-        -
-          required: true
-          schema:
-            title: "Bits"
-            type: "string"
-          name: "bits"
-          in: "path"
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-        422:
-          description: "Validation Error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HTTPValidationError"
-  /ask:
-    post:
-      summary: "Ask"
-      operationId: "ask_ask_post"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AskRequest"
-        required: true
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-        422:
-          description: "Validation Error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HTTPValidationError"
-  /actions:
-    get:
-      summary: "List Actions"
-      description: "Return all registered action names and their types."
-      operationId: "list_actions_actions_get"
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-  /test-actions:
-    get:
-      summary: "Test Actions"
-      description: "Invoke each registered action with minimal defaults."
-      operationId: "test_actions_test_actions_get"
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-  /perform:
-    post:
-      summary: "Perform"
-      operationId: "perform_perform_post"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/IntentRequest"
-        required: true
-      responses:
-        200:
-          description: "Successful Response"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties: true
-        422:
-          description: "Validation Error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HTTPValidationError"
+  # ... (all your existing paths)
 components:
   schemas:
     AskRequest:
@@ -336,6 +25,10 @@ components:
         seed:
           title: "Seed"
           type: "integer"
+      example:
+        question: "What is the symbolic meaning of entanglement?"
+        user_id: "testuser"
+        seed: 123
     CircuitRequest:
       title: "CircuitRequest"
       required:
@@ -354,6 +47,14 @@ components:
           title: "Use Previous"
           type: "boolean"
           default: false
+      example:
+        gates:
+          - name: "H"
+            qubits: [0]
+          - name: "CNOT"
+            qubits: [1, 0]
+        seed: 42
+        use_previous: false
     DensityRequest:
       title: "DensityRequest"
       required:
@@ -377,6 +78,18 @@ components:
           type: "object"
           additionalProperties:
             type: "number"
+      example:
+        gates:
+          - name: "X"
+            qubits: [0]
+          - name: "H"
+            qubits: [1]
+        seed: 77
+        use_previous: false
+        noise:
+          gamma: 0.2
+          qubit: 1
+          type: "amplitude"
     EntropyRequest:
       title: "EntropyRequest"
       required:
@@ -388,6 +101,8 @@ components:
           type: "array"
           items:
             type: "integer"
+      example:
+        subsystem: [0, 1]
     GateOp:
       title: "GateOp"
       required:
@@ -408,6 +123,10 @@ components:
           type: "array"
           items:
             type: "number"
+      example:
+        name: "Rx"
+        qubits: [0]
+        params: [1.5708]
     HTTPValidationError:
       title: "HTTPValidationError"
       type: "object"
@@ -432,6 +151,10 @@ components:
         seed:
           title: "Seed"
           type: "integer"
+      example:
+        intent: "emergence"
+        params: {}
+        seed: 99
     ValidationError:
       title: "ValidationError"
       required:
@@ -445,10 +168,8 @@ components:
           type: "array"
           items:
             anyOf:
-              -
-                type: "string"
-              -
-                type: "integer"
+              - type: "string"
+              - type: "integer"
         msg:
           title: "Message"
           type: "string"

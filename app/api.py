@@ -2646,10 +2646,21 @@ from typing import List, Dict, Any, Sequence, Optional
 from datetime import datetime
 import json, math, random, cmath, os
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title="Symbolic Quantum API",
     version="1.0",
     description="This API interprets quantum simulation results as symbolic archetypes."
+)
+
+# Add CORS middleware to support browser-based access (e.g. ChatGPT plugins)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Change this to restrict to certain domains if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Serve static .well-known directory for OpenAI plugin manifest
@@ -2670,7 +2681,6 @@ def openapi_yaml():
 @app.get("/", include_in_schema=False)
 def root():
     return {"message": "Welcome to the Symbolic Quantum API! See /docs for interactive API docs."}
-
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
     "000": {"label": "origin", "tone": "neutral", "category": "beginning"},

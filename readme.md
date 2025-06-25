@@ -5,7 +5,7 @@ measurements of a lightweight quantum simulator as archetypal symbols. The
 service can be used by custom GPT models to generate grounded insights.
 
 ## Features
-- Pure Python quantum simulator (`app/quantum_sim.py`)
+- Pure Python quantum simulator (all in `app/api.py`)
 - Symbolic interpretation layer with predefined and uploaded symbols
 - Endpoints for circuit simulation, symbolic spreads, and intent-based actions
 - OpenAPI 3.1 schema available at `/openapi.yaml`
