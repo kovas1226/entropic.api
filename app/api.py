@@ -2640,19 +2640,25 @@ LEGACY_MANUAL = _b64.b64decode(LEGACY_MANUAL_B64.encode()).decode()
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.openapi.utils import get_openapi
+from fastapi.staticfiles import StaticFiles  # <--- Import here
 from pydantic import BaseModel
 from typing import List, Dict, Any, Sequence, Optional
 from datetime import datetime
 import json, math, random, cmath, os
 
-
 app = FastAPI(
     title="Symbolic Quantum API",
     version="1.0",
-    description=(
-        "This API interprets quantum simulation results as symbolic archetypes."
-    ),
+    description="This API interprets quantum simulation results as symbolic archetypes."
 )
+
+# Serve static .well-known directory
+app.mount(
+    "/.well-known",
+    StaticFiles(directory=os.path.join(os.path.dirname(__file__), "../.well-known")),
+    name="well-known",
+)
+
 
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
