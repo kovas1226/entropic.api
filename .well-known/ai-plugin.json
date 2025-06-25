@@ -6,10 +6,10 @@
   "auth": { "type": "none" },
   "api": {
     "type": "openapi",
-   "url": "https://entropic-api.onrender.com/openapi.yaml",
+    "url": "https://entropic-api.onrender.com/openapi.yaml",
     "is_user_authenticated": false
   },
   "logo_url": "https://openai.com/favicon.ico",
   "contact_email": "kovasange@gmail.com",
-  "legal_info_url": "https://example.com/legal"
+  "legal_info_url": "https://entropic-api.onrender.com/legal"
 }

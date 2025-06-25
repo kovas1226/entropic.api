@@ -2636,9 +2636,8 @@ aW4uanNvbiIsIG1lZGlhX3R5cGU9ImFwcGxpY2F0aW9uL2pzb24iKQoK
 """
 LEGACY_MANUAL = _b64.b64decode(LEGACY_MANUAL_B64.encode()).decode()
 
-
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -2646,18 +2645,18 @@ from typing import List, Dict, Any, Sequence, Optional
 from datetime import datetime
 import json, math, random, cmath, os
 
-from fastapi.middleware.cors import CORSMiddleware
-
 app = FastAPI(
     title="Symbolic Quantum API",
     version="1.0",
-    description="This API interprets quantum simulation results as symbolic archetypes."
+    description="This API interprets quantum simulation results as symbolic archetypes.",
+    servers=[{"url": "https://entropic-api.onrender.com"}]
 )
 
-# Add CORS middleware to support browser-based access (e.g. ChatGPT plugins)
+# CORS middleware for browser-based tools (optional, comment out if undesired)
+from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Change this to restrict to certain domains if needed
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -2677,10 +2676,43 @@ OPENAPI_YAML_PATH = os.path.join(os.path.dirname(__file__), "../app/openai.yaml"
 def openapi_yaml():
     return FileResponse(OPENAPI_YAML_PATH, media_type="application/yaml")
 
-# Optional: Friendly root message for humans and plugin testers
+@app.get("/openapi.json", include_in_schema=False)
+def openapi_json():
+    schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        description=app.description,
+        routes=app.routes,
+        openapi_version="3.1.0",
+    )
+    schema["servers"] = [{"url": "https://entropic-api.onrender.com"}]
+    return schema
+
+# Friendly root message for humans and plugin testers
 @app.get("/", include_in_schema=False)
 def root():
     return {"message": "Welcome to the Symbolic Quantum API! See /docs for interactive API docs."}
+
+# Minimal legal/disclaimer endpoint for plugin compliance
+@app.get("/legal", include_in_schema=False)
+def legal():
+    html = """
+    <html>
+    <head><title>Legal Information</title></head>
+    <body>
+    <h1>Legal & Privacy Information</h1>
+    <p>
+      This API is provided as-is for educational and experimental purposes.
+      No personal data is collected or stored beyond transient request processing.
+      Use at your own discretion. For inquiries, contact kovasange@gmail.com.
+    </p>
+    <p>
+      If you have concerns about privacy or data usage, please email us before using the service.
+    </p>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html)
 # mapping from basis strings to symbolic archetypes
 SYMBOL_MAP: Dict[str, Dict[str, str]] = {
     "000": {"label": "origin", "tone": "neutral", "category": "beginning"},
