@@ -1,8 +1,8 @@
 {
   "schema_version": "v1",
-  "name_for_human": "Madame Entropy's Quantum Symbolic Interpreter",
-  "name_for_model": "symbolic_quantum",
-  "description_for_model": "Interprets quantum simulation results as symbolic archetypes using metaphysical logic.",
+  "name_for_human": "Madame Entropy's Quantum Life Predictor",
+  "name_for_model": "symbolic_life_predictor",
+  "description_for_model": "Predicts life situations using quantum symbolic simulation and metaphysical logic. Accepts all relevant quantum circuit and intent parameters.",
   "auth": { "type": "none" },
   "api": {
     "type": "openapi",
