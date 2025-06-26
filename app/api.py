@@ -2643,7 +2643,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Dict, Any, Sequence, Optional
 from datetime import datetime
-import json, math, random, cmath, os
+import math, random, cmath, os
 
 app = FastAPI(
     title="Symbolic Quantum API",
@@ -3575,87 +3575,8 @@ def perform(req: IntentRequest):
         return {"error": str(exc)}
 
 
-def _to_yaml(obj, indent=0):
-    """Convert a Python data structure to a YAML string."""
-    ind = "  " * indent
-    if isinstance(obj, dict):
-        lines = []
-        for k, v in obj.items():
-            if isinstance(v, (dict, list)):
-                lines.append(f"{ind}{k}:")
-                lines.append(_to_yaml(v, indent + 1))
-            else:
-                if isinstance(v, str):
-                    v = json.dumps(v)
-                elif isinstance(v, bool):
-                    v = "true" if v else "false"
-                lines.append(f"{ind}{k}: {v}")
-        return "\n".join(lines)
-    elif isinstance(obj, list):
-        lines = []
-        for item in obj:
-            prefix = f"{ind}-"
-            if isinstance(item, (dict, list)):
-                lines.append(prefix)
-                lines.append(_to_yaml(item, indent + 1))
-            else:
-                if isinstance(item, str):
-                    val = json.dumps(item)
-                elif isinstance(item, bool):
-                    val = "true" if item else "false"
-                else:
-                    val = item
-                lines.append(f"{prefix} {val}")
-        return "\n".join(lines)
-    else:
-        return f"{obj}"
-
-
-def generate_openapi_yaml(path: str = "openapi.yaml") -> None:
-    """Generate OpenAPI spec in YAML format and write to *path*."""
-    schema = get_openapi(
-        title=app.title,
-        version=app.version,
-        description=app.description,
-        routes=app.routes,
-        openapi_version="3.1.0",
-    )
-    schema["openapi"] = "3.1.0"
-    schema["servers"] = [{"url": "https://entropic-api.onrender.com"}]
-
-    # Ensure all JSON responses explicitly declare a schema of type object
-    for path_item in schema.get("paths", {}).values():
-        for method in path_item.values():
-            if not isinstance(method, dict):
-                continue
-            responses = method.get("responses", {})
-            for response in responses.values():
-                content = response.get("content", {})
-                json_content = content.get("application/json")
-                if json_content is None:
-                    continue
-                schema_obj = json_content.get("schema")
-                if not schema_obj:
-                    schema_obj = json_content["schema"] = {"type": "object"}
-                if schema_obj.get("type") == "object" and "additionalProperties" not in schema_obj:
-                    schema_obj["additionalProperties"] = True
-    ordered = {
-        "openapi": schema["openapi"],
-        "info": schema["info"],
-        "servers": schema["servers"],
-        "paths": schema["paths"],
-        "components": schema.get("components", {}),
-    }
-    with open(path, "w") as fh:
-        fh.write(_to_yaml(ordered) + "\n")
-
+OPENAPI_YAML_PATH = os.path.join(os.path.dirname(__file__), "../app/openai.yaml")
 
 @app.get("/openapi.yaml", include_in_schema=False)
-def serve_openapi():
-    """Serve the generated OpenAPI specification."""
-    if not os.path.exists("openapi.yaml"):
-        generate_openapi_yaml("openapi.yaml")
-    return FileResponse("openapi.yaml", media_type="text/yaml")
-
-
-generate_openapi_yaml("openapi.yaml")
+def openapi_yaml():
+    return FileResponse(OPENAPI_YAML_PATH, media_type="application/yaml")
