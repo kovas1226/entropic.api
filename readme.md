@@ -36,7 +36,7 @@ service can be used by custom GPT models or plugins to generate grounded, eerily
 - `/symbols`  
   View or upload custom archetypes.
 
-See the OpenAPI spec (`/openapi.yaml`) for the full list.
+See the OpenAPI spec (`/openai.yaml`) for the full list.
 
 ## Deployment
 The included `render.yaml` file configures the service for Render.com. When
@@ -48,9 +48,13 @@ Run the unit tests with `pytest`:
 ```bash
 pytest -q
 ```
-Some tests require `httpx`; if not installed, tests will be skipped.
+Some tests require `httpx`; if it isn't installed the tests will be skipped.
+Install dependencies from `requirements.txt` first to ensure `httpx` is
+available. You can also run `scripts/run_tests.sh` to automatically install
+dependencies and execute the test suite.
+
 
 ---
 
 **For custom GPT integration:**  
-Point your GPT or plugin manifest at `/openapi.yaml` and use `/predict-life` for uncannily specific, friend-like readings.
+Point your GPT or plugin manifest at `/openai.yaml` and use `/predict-life` for uncannily specific, friend-like readings.
