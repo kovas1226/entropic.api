@@ -3573,10 +3573,3 @@ def perform(req: IntentRequest):
         if info["type"] == "quantum":
             return symbolic_fallback(req.intent, exc)
         return {"error": str(exc)}
-
-
-OPENAPI_YAML_PATH = os.path.join(os.path.dirname(__file__), "../app/openai.yaml")
-
-@app.get("/openapi.yaml", include_in_schema=False)
-def openapi_yaml():
-    return FileResponse(OPENAPI_YAML_PATH, media_type="application/yaml")

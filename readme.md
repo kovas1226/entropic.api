@@ -50,7 +50,7 @@ pytest -q
 ```
 Some tests require `httpx`; if it isn't installed the tests will be skipped.
 Install dependencies from `requirements.txt` first to ensure `httpx` is
-available. You can also run `scripts/run_tests.sh` to automatically install
+available. You can also run `./scripts/run_tests.sh` to automatically install
 dependencies and execute the test suite.
 
 
